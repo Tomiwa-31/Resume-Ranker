@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Parser | Extract Skills & Experience</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <h1 class="display-4">
+                        <i class="fas fa-file-alt text-info me-3"></i>Resume Parser
+                    </h1>
+                    <p class="lead text-secondary">Extract skills and experience from your resume</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Error Display -->
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <!-- Upload Card -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4">Upload Your Resume</h5>
+                        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="resumeForm">
+                            <div class="mb-4">
+                                <div class="file-upload-wrapper">
+                                    <div class="file-upload-message">
+                                        <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-info"></i>
+                                        <p>Drag & drop your PDF or DOCX file here<br>or click to browse files</p>
+                                    </div>
+                                    <input type="file" name="resume" id="resumeUpload" class="form-control" accept=".pdf,.docx" required>
+                                </div>
+                                <div id="selectedFileName" class="mt-2 text-center text-info d-none">
+                                    <i class="fas fa-file me-2"></i><span></span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-cogs me-2"></i>Parse Resume
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Feature Overview -->
+                <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+                    <div class="col">
+                        <div class="card h-100 border-0 bg-secondary bg-opacity-10">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-tools text-info me-2"></i>Skills Extraction
+                                </h5>
+                                <p class="card-text">Automatically identify technical and soft skills from your resume.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border-0 bg-secondary bg-opacity-10">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-briefcase text-info me-2"></i>Experience Analysis
+                                </h5>
+                                <p class="card-text">Extract work history and professional experience sections.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border-0 bg-secondary bg-opacity-10">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-file-download text-info me-2"></i>Export Results
+                                </h5>
+                                <p class="card-text">Download the extracted information in JSON format for further use.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border-0 bg-secondary bg-opacity-10">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-file-pdf text-info me-2"></i>Multiple Formats
+                                </h5>
+                                <p class="card-text">Supports both PDF and DOCX file formats for maximum compatibility.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="text-center mt-5">
+                    <p class="text-secondary small">
+                        This tool processes your resume and extracts relevant information.<br>
+                        Your data is not stored beyond your session.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
