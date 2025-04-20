@@ -1,0 +1,49 @@
+John Doe
+123 Main Street, City, State 12345
+Phone: (123) 456-7890
+Email: john.doe@example.com
+
+PROFESSIONAL SUMMARY
+Experienced software developer with 8+ years of expertise in web development, database design, and application architecture. Proficient in multiple programming languages and frameworks.
+
+SKILLS
+Programming Languages: Python, JavaScript, Java, C++
+Web Technologies: HTML5, CSS3, React, Angular
+Databases: PostgreSQL, MongoDB, MySQL
+Tools: Git, Docker, Jenkins, AWS
+
+WORK EXPERIENCE
+
+Senior Software Engineer
+ABC Tech Solutions | Jan 2019 - Present
+• Led a team of 5 developers to build a cloud-based inventory management system
+• Implemented CI/CD pipeline reducing deployment time by 60%
+• Optimized database queries resulting in 40% faster application performance
+• Developed RESTful APIs for mobile applications
+
+Software Developer
+XYZ Software Inc. | Mar 2015 - Dec 2018
+• Designed and developed front-end interfaces using React and Angular
+• Created automated testing scripts reducing bug discovery time by 35%
+• Collaborated with UX designers to improve user interface and experience
+• Maintained and updated legacy code systems
+
+Junior Developer
+Tech Startups LLC | Jun 2013 - Feb 2015
+• Assisted in developing e-commerce platforms for small businesses
+• Debugged and fixed issues in existing applications
+• Created technical documentation for projects
+
+EDUCATION
+Bachelor of Science in Computer Science
+University of Technology | Graduated: 2013
+
+CERTIFICATIONS
+• AWS Certified Developer - Associate
+• MongoDB Certified Developer
+• Certified Scrum Master
+
+PROJECTS
+• Personal Finance Tracker - A web application to track expenses and budget
+• Community Forum - A discussion platform with user authentication and moderation tools
+• Weather App - Mobile application that provides real-time weather updates

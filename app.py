@@ -20,7 +20,7 @@ app.secret_key = os.environ.get("SESSION_SECRET", "default-dev-secret")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configure upload settings
-ALLOWED_EXTENSIONS = {'pdf', 'docx'}
+ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}  # Added txt for testing
 UPLOAD_FOLDER = tempfile.gettempdir()
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -35,64 +35,91 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     # Add more detailed logging
+    print("\n\n***** UPLOAD REQUEST RECEIVED *****\n\n")
     logger.debug("Upload request received")
     
     # Check if file part exists in the request
     if 'resume' not in request.files:
+        print("NO FILE PART IN REQUEST")
         logger.warning("No file part in the request")
         flash('No file part', 'danger')
-        return redirect(request.url)
+        return redirect(url_for('index'))
     
     file = request.files['resume']
+    print(f"FILE RECEIVED: {file.filename}")
     logger.debug(f"File received: {file.filename}")
     
     # Check if user submitted an empty form
     if file.filename == '':
+        print("EMPTY FILENAME SUBMITTED")
         logger.warning("Empty filename submitted")
         flash('No file selected', 'danger')
         return redirect(url_for('index'))
     
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    # Check file extension
+    if not allowed_file(file.filename):
+        print(f"INVALID FILE TYPE: {file.filename}")
+        logger.warning(f"Invalid file type: {file.filename}")
+        flash('File type not allowed. Please upload PDF, DOCX, or TXT files only.', 'danger')
+        return redirect(url_for('index'))
+    
+    # Process valid file
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    try:
+        print(f"SAVING FILE TO: {filepath}")
         logger.debug(f"Saving file to: {filepath}")
         file.save(filepath)
         
-        try:
-            # Parse the resume
-            logger.debug(f"Parsing resume file: {filename}")
+        # Parse the resume
+        print(f"PARSING RESUME: {filename}")
+        logger.debug(f"Parsing resume file: {filename}")
+        
+        # Create a simple text file handler for the sample resume
+        if filename.endswith('.txt'):
+            with open(filepath, 'r') as f:
+                text_content = f.read()
+        else:
             text_content = parse_resume(filepath)
-            logger.debug("Resume parsing successful")
-            
-            # Extract skills and experience
-            logger.debug("Extracting skills and experience")
-            extracted_data = extract_skills_experience(text_content)
-            logger.debug(f"Extraction complete. Skills found: {len(extracted_data.get('skills', {}).get('identified', []))}")
-            
-            # Store results in session
-            logger.debug("Storing results in session")
-            session['extracted_data'] = extracted_data
-            
-            # Clean up the temporary file
-            logger.debug(f"Removing temporary file: {filepath}")
+        
+        print("RESUME PARSING SUCCESSFUL")
+        logger.debug("Resume parsing successful")
+        
+        # Extract skills and experience
+        print("EXTRACTING SKILLS AND EXPERIENCE")
+        logger.debug("Extracting skills and experience")
+        extracted_data = extract_skills_experience(text_content)
+        
+        skill_count = len(extracted_data.get('skills', {}).get('identified', []))
+        print(f"EXTRACTION COMPLETE. SKILLS FOUND: {skill_count}")
+        logger.debug(f"Extraction complete. Skills found: {skill_count}")
+        
+        # Store results in session
+        print("STORING RESULTS IN SESSION")
+        logger.debug("Storing results in session")
+        session['extracted_data'] = extracted_data
+        
+        # Clean up the temporary file
+        print(f"REMOVING TEMPORARY FILE: {filepath}")
+        logger.debug(f"Removing temporary file: {filepath}")
+        os.remove(filepath)
+        
+        # Redirect to results page
+        print("REDIRECTING TO RESULTS PAGE")
+        logger.debug("Redirecting to results page")
+        return redirect(url_for('show_results'))
+    
+    except Exception as e:
+        # Clean up the temporary file in case of error
+        if 'filepath' in locals() and os.path.exists(filepath):
+            print(f"REMOVING TEMPORARY FILE AFTER ERROR: {filepath}")
+            logger.debug(f"Removing temporary file after error: {filepath}")
             os.remove(filepath)
             
-            # Redirect to results page
-            logger.debug("Redirecting to results page")
-            return redirect(url_for('show_results'))
-        
-        except Exception as e:
-            # Clean up the temporary file in case of error
-            if os.path.exists(filepath):
-                logger.debug(f"Removing temporary file after error: {filepath}")
-                os.remove(filepath)
-                
-            logger.error(f"Error processing file: {str(e)}", exc_info=True)
-            flash(f'Error processing file: {str(e)}', 'danger')
-            return redirect(url_for('index'))
-    else:
-        logger.warning(f"Invalid file type: {file.filename}")
-        flash('File type not allowed. Please upload PDF or DOCX files only.', 'danger')
+        print(f"ERROR PROCESSING FILE: {str(e)}")
+        logger.error(f"Error processing file: {str(e)}", exc_info=True)
+        flash(f'Error processing file: {str(e)}', 'danger')
         return redirect(url_for('index'))
 
 @app.route('/results')

@@ -132,9 +132,9 @@ function validateForm() {
         return false;
     }
     
-    if (!['pdf', 'docx'].includes(fileExt)) {
+    if (!['pdf', 'docx', 'txt'].includes(fileExt)) {
         logMessage(`Invalid file type: ${fileExt}`, 'error');
-        alert('Invalid file type. Please upload a PDF or DOCX file.');
+        alert('Invalid file type. Please upload a PDF, DOCX, or TXT file.');
         return false;
     }
     
