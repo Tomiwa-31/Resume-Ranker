@@ -34,48 +34,64 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    # Add more detailed logging
+    logger.debug("Upload request received")
+    
     # Check if file part exists in the request
     if 'resume' not in request.files:
+        logger.warning("No file part in the request")
         flash('No file part', 'danger')
         return redirect(request.url)
     
     file = request.files['resume']
+    logger.debug(f"File received: {file.filename}")
     
     # Check if user submitted an empty form
     if file.filename == '':
+        logger.warning("Empty filename submitted")
         flash('No file selected', 'danger')
         return redirect(url_for('index'))
     
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        logger.debug(f"Saving file to: {filepath}")
         file.save(filepath)
         
         try:
             # Parse the resume
+            logger.debug(f"Parsing resume file: {filename}")
             text_content = parse_resume(filepath)
+            logger.debug("Resume parsing successful")
             
             # Extract skills and experience
+            logger.debug("Extracting skills and experience")
             extracted_data = extract_skills_experience(text_content)
+            logger.debug(f"Extraction complete. Skills found: {len(extracted_data.get('skills', {}).get('identified', []))}")
             
             # Store results in session
+            logger.debug("Storing results in session")
             session['extracted_data'] = extracted_data
             
             # Clean up the temporary file
+            logger.debug(f"Removing temporary file: {filepath}")
             os.remove(filepath)
             
             # Redirect to results page
+            logger.debug("Redirecting to results page")
             return redirect(url_for('show_results'))
         
         except Exception as e:
             # Clean up the temporary file in case of error
             if os.path.exists(filepath):
+                logger.debug(f"Removing temporary file after error: {filepath}")
                 os.remove(filepath)
                 
-            logger.error(f"Error processing file: {str(e)}")
+            logger.error(f"Error processing file: {str(e)}", exc_info=True)
             flash(f'Error processing file: {str(e)}', 'danger')
             return redirect(url_for('index'))
     else:
+        logger.warning(f"Invalid file type: {file.filename}")
         flash('File type not allowed. Please upload PDF or DOCX files only.', 'danger')
         return redirect(url_for('index'))
 
