@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Job Description | Resume Parser</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="mb-0">
+                            <i class="fas fa-plus-circle text-info me-2"></i>Create Job Description
+                        </h1>
+                        <p class="text-secondary">Add a new job description to match resumes against</p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('job_descriptions') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Jobs
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Create Job Form -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <form action="{{ url_for('create_job') }}" method="post">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                                <div class="form-text">Enter the title of the position (e.g., "Senior Frontend Developer")</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="company" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="company" name="company">
+                                <div class="form-text">Enter the name of the company</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="required_skills" class="form-label">Required Skills</label>
+                                <textarea class="form-control" id="required_skills" name="required_skills" rows="4" placeholder="Enter skills separated by commas or new lines"></textarea>
+                                <div class="form-text">List skills required for this position (e.g., "JavaScript, React, TypeScript")</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Job Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" name="description" rows="8" required></textarea>
+                                <div class="form-text">Enter the full job description with responsibilities, requirements, etc.</div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Create Job Description
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="card shadow-sm border-0 bg-secondary bg-opacity-10">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-lightbulb text-info me-2"></i>Tips for Better Matching
+                        </h5>
+                        <ul class="mb-0">
+                            <li class="mb-2">Include specific technical skills that are essential for the role</li>
+                            <li class="mb-2">Be detailed in your job description to improve the matching algorithm</li>
+                            <li class="mb-2">List both technical and soft skills needed for the position</li>
+                            <li>Separate skills with commas or new lines for better parsing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

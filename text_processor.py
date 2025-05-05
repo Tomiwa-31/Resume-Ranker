@@ -10,19 +10,40 @@ logger = logging.getLogger(__name__)
 COMMON_SKILLS = [
     # Programming languages
     "python", "java", "javascript", "typescript", "c++", "c#", "ruby", "php", "swift", "go", "rust", "kotlin", "scala",
+    "perl", "shell", "bash", "powershell", "vba", "matlab", "r programming", "objective-c", "groovy", "haskell",
+    "lua", "clojure", "elixir", "dart", "fortran", "cobol", "assembly", "delphi", "pascal",
+    
     # Web development
     "html", "css", "react", "angular", "vue", "node.js", "express", "django", "flask", "rails", "asp.net",
-    # Data science
+    "spring boot", "laravel", "symfony", "jquery", "bootstrap", "tailwind css", "material ui", "redux", "next.js",
+    "nuxt.js", "svelte", "webpack", "babel", "pwa", "graphql", "rest api", "soap", "xml", "json", "seo",
+    
+    # Data science & Database
     "machine learning", "data analysis", "deep learning", "nlp", "data mining", "pandas", "numpy", "scikit-learn", 
-    "tensorflow", "pytorch", "r", "statistics", "tableau", "power bi", "sql",
-    # DevOps
+    "tensorflow", "pytorch", "r", "statistics", "tableau", "power bi", "sql", "mysql", "postgresql", "mongodb",
+    "oracle", "sqlite", "nosql", "redis", "elasticsearch", "cassandra", "mariadb", "ms sql server", "hadoop",
+    "spark", "hive", "data warehouse", "etl", "data modeling", "data visualization", "big data", "ai",
+    
+    # DevOps & Cloud
     "aws", "azure", "gcp", "docker", "kubernetes", "ci/cd", "jenkins", "terraform", "ansible", "git", "github",
-    "gitlab", "devops",
-    # Mobile
-    "android", "ios", "react native", "flutter", "swift", "xamarin",
+    "gitlab", "devops", "devsecops", "infrastructure as code", "cloud computing", "serverless", "microservices",
+    "containers", "virtualization", "vmware", "linux", "unix", "windows server", "networking", "cybersecurity",
+    "security", "penetration testing", "firewall", "encryption", "ssl/tls", "vpn", 
+    
+    # Mobile & Desktop
+    "android", "ios", "react native", "flutter", "swift", "xamarin", "mobile development", "app development",
+    "winforms", "wpf", "uwp", "electron", "qt", "gtk", "desktop applications", "mobile apps",
+    
+    # Project Management & Tools
+    "jira", "confluence", "trello", "asana", "scrum", "agile", "kanban", "waterfall", "prince2", "pmp", "msp",
+    "project management", "product management", "slack", "microsoft teams", "microsoft office", "excel",
+    "word", "powerpoint", "visio", "adobe", "photoshop", "illustrator", "figma", "sketch",
+    
     # Soft skills
-    "leadership", "communication", "teamwork", "problem solving", "critical thinking", "time management", 
-    "project management", "agile", "scrum"
+    "leadership", "communication", "teamwork", "problem solving", "critical thinking", "time management",
+    "collaboration", "organization", "analytical skills", "attention to detail", "creativity", "adaptability",
+    "flexibility", "interpersonal skills", "conflict resolution", "decision making", "strategic thinking",
+    "negotiation", "customer service", "presentation skills", "mentoring"
 ]
 
 # Common section headers in resumes
@@ -33,7 +54,12 @@ EXPERIENCE_HEADERS = [
 
 SKILLS_HEADERS = [
     "skills", "technical skills", "core competencies", "proficiencies", "expertise", "competencies",
-    "technical proficiencies", "key skills", "skill set"
+    "technical proficiencies", "key skills", "skill set", "technologies", "tech stack", "languages",
+    "programming languages", "frameworks", "tools", "software", "platforms", "qualifications",
+    "professional skills", "technical expertise", "areas of expertise", "strengths", "capabilities",
+    "relevant skills", "professional competencies", "specialties", "specializations", "key strengths",
+    "abilities", "key capabilities", "technologies used", "technical tools", "soft skills", "hard skills",
+    "knowledge areas", "computer skills"
 ]
 
 def extract_skills_experience(text):
@@ -128,14 +154,18 @@ def extract_skills(text, sections):
     Returns:
         list: List of identified skills
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     identified_skills = set()
     
     # Check if we have a dedicated skills section
     for header in SKILLS_HEADERS:
         if header in sections:
             section_text = sections[header]
-            # Look for comma or bullet separated skills
-            skill_candidates = re.split(r'[,•\n]', section_text)
+            logger.debug(f"Found skills section with header: {header}")
+            # Look for comma, bullet, semicolon or newline separated skills
+            skill_candidates = re.split(r'[,;•\n]', section_text)
             for skill in skill_candidates:
                 skill = skill.strip()
                 if skill and len(skill) > 2:  # Avoid very short matches
@@ -146,6 +176,35 @@ def extract_skills(text, sections):
         if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE):
             identified_skills.add(skill)
     
+    # Try to find skill lists with bullets or numbers
+    bullet_lists = re.findall(r'(?:•|\* |\d+\.) (.+?)(?=(?:•|\* |\d+\.)|$)', text)
+    for item in bullet_lists:
+        item = item.strip()
+        if item and len(item) > 2 and len(item) < 50:  # Reasonable length for a skill
+            identified_skills.add(item)
+    
+    # Try to extract skills from "proficient in" or "experienced with" phrases
+    skill_phrases = [
+        r'proficient (?:in|with) (.+?)(?=\.|,|\n|$)',
+        r'experienced (?:in|with) (.+?)(?=\.|,|\n|$)',
+        r'knowledge of (.+?)(?=\.|,|\n|$)',
+        r'familiar with (.+?)(?=\.|,|\n|$)',
+        r'expertise in (.+?)(?=\.|,|\n|$)'
+    ]
+    
+    for phrase in skill_phrases:
+        matches = re.finditer(phrase, text, re.IGNORECASE)
+        for match in matches:
+            skill_text = match.group(1).strip()
+            if skill_text and len(skill_text) > 2:
+                # Further split by commas or 'and'
+                sub_skills = re.split(r',|\sand\s', skill_text)
+                for sub_skill in sub_skills:
+                    sub_skill = sub_skill.strip()
+                    if sub_skill and len(sub_skill) > 2:
+                        identified_skills.add(sub_skill)
+    
+    logger.debug(f"Extracted {len(identified_skills)} skills")
     return sorted(list(identified_skills))
 
 def extract_experience(text, sections):

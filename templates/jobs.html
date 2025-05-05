@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Descriptions | Resume Parser</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="mb-0">
+                            <i class="fas fa-briefcase text-info me-2"></i>Job Descriptions
+                        </h1>
+                        <p class="text-secondary">Manage job descriptions and view matched resumes</p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                        <a href="{{ url_for('create_job') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Add New Job
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Job Descriptions List -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-0">
+                        {% if jobs %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="bg-secondary bg-opacity-10">
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Company</th>
+                                            <th>Required Skills</th>
+                                            <th>Resumes</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for job in jobs %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ job.title }}</strong>
+                                                </td>
+                                                <td>{{ job.company or "-" }}</td>
+                                                <td>
+                                                    {% if job.get_required_skills() %}
+                                                        {% for skill in job.get_required_skills()[:3] %}
+                                                            <span class="badge bg-info bg-opacity-25 rounded-pill me-1">{{ skill }}</span>
+                                                        {% endfor %}
+                                                        {% if job.get_required_skills()|length > 3 %}
+                                                            <span class="badge bg-secondary rounded-pill">+{{ job.get_required_skills()|length - 3 }}</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="text-secondary">No skills specified</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ job.resumes|length }}</td>
+                                                <td>{{ job.created_at.strftime('%b %d, %Y') }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('view_job', job_id=job.id) }}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye me-1"></i>View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-briefcase text-secondary fa-3x mb-3"></i>
+                                <p class="text-secondary">No job descriptions found.</p>
+                                <a href="{{ url_for('create_job') }}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus me-1"></i>Add Job Description
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="card shadow-sm border-0 bg-secondary bg-opacity-10">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-info-circle text-info me-2"></i>How It Works
+                        </h5>
+                        <ol class="mb-0">
+                            <li class="mb-2">Create job descriptions with required skills</li>
+                            <li class="mb-2">Upload resumes and select the job to match against</li>
+                            <li class="mb-2">View candidates ranked by match score</li>
+                            <li>Select the best candidates for your position</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

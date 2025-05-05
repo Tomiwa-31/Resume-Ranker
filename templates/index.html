@@ -23,7 +23,7 @@
                     <p class="lead text-secondary">Extract skills and experience from your resume</p>
                 </div>
 
-                <!-- Flash Messages -->
+                <!-- Flash Messages -->s
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
@@ -59,6 +59,33 @@
                                     <i class="fas fa-file me-2"></i><span></span>
                                 </div>
                             </div>
+                            
+                            {% if job_descriptions and job_descriptions|length > 0 %}
+                            <div class="mb-4">
+                                <label for="job_id" class="form-label">Match Against Job Description (Optional)</label>
+                                <select class="form-select" id="job_id" name="job_id">
+                                    <option value="">-- Select a job description --</option>
+                                    {% for job in job_descriptions %}
+                                    <option value="{{ job.id }}" {% if request.args.get('job_id')|int == job.id %}selected{% endif %}>
+                                        {{ job.title }}{% if job.company %} at {{ job.company }}{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    Select a job description to match this resume against and get a match score.
+                                    <a href="{{ url_for('job_descriptions') }}">Manage job descriptions</a>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Want to match resumes against job descriptions?</strong>
+                                <p class="mb-1 mt-2">Create job descriptions to rank your resumes by match score.</p>
+                                <a href="{{ url_for('create_job') }}" class="btn btn-sm btn-info mt-2">
+                                    <i class="fas fa-plus-circle me-1"></i>Create Job Description
+                                </a>
+                            </div>
+                            {% endif %}
                             
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg">
@@ -130,3 +157,4 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
+1`

@@ -46,7 +46,22 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title mb-0">Extraction Overview</h5>
+                            <div>
+                                <h5 class="card-title mb-0">Extraction Overview</h5>
+                                {% if data.candidate_info %}
+                                <div class="mt-2">
+                                    {% if data.candidate_info.name %}
+                                    <div><i class="fas fa-user text-info me-2"></i>{{ data.candidate_info.name }}</div>
+                                    {% endif %}
+                                    {% if data.candidate_info.email %}
+                                    <div><i class="fas fa-envelope text-info me-2"></i>{{ data.candidate_info.email }}</div>
+                                    {% endif %}
+                                    {% if data.candidate_info.phone %}
+                                    <div><i class="fas fa-phone text-info me-2"></i>{{ data.candidate_info.phone }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
                             <div class="text-end">
                                 <span class="badge bg-info me-1">
                                     <i class="fas fa-tools me-1"></i>Skills: {{ data.skills.confidence }}%
@@ -56,6 +71,30 @@
                                 </span>
                             </div>
                         </div>
+                        
+                        {% if data.job_match %}
+                        <div class="alert alert-info bg-opacity-25 mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Job Match: {{ data.job_match.job_title }}</h6>
+                                    <div class="progress" style="height: 8px; width: 250px;">
+                                        <div class="progress-bar bg-info" role="progressbar" 
+                                             style="width: {{ data.job_match.match_score }}%;" 
+                                             aria-valuenow="{{ data.job_match.match_score }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <div class="mt-1">
+                                        <span class="fw-bold">{{ "%.1f"|format(data.job_match.match_score) }}%</span> match score
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('view_job', job_id=data.job_match.job_id) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-eye me-1"></i>View Job
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
                         
                         <div class="alert alert-secondary bg-opacity-25 mb-0">
                             <p class="mb-0">
